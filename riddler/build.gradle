@@ -1,0 +1,16 @@
+apply plugin: 'groovy'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    groovy localGroovy()
+    compile('org.codehaus.groovy.sparql:groovy-sparql:0.3') { exclude group: 'xerces', module: 'xercesImpl'}
+    compile 'xerces:xercesImpl:2.7.1',
+        'com.google.appengine:appengine-remote-api:1.7.0',
+        'com.google.appengine:appengine-api-1.0-sdk:1.7.0'
+
+}
+

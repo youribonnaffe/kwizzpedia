@@ -1,0 +1,92 @@
+import org.apache.ivy.plugins.resolver.URLResolver
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'gae'
+apply plugin: 'gaelyk'
+
+def compatibilityVersion = 1.6
+sourceCompatibility = compatibilityVersion
+targetCompatibility = compatibilityVersion
+
+buildscript {
+   /* gitHub = {
+        def resolver = new URLResolver()
+
+        resolver.with {
+            name = 'GitHub'
+            addArtifactPattern 'http://cloud.github.com/downloads/[organisation]/[module]/[module]-[revision].[ext]'
+        }
+
+        resolver
+    }*/
+
+    repositories {
+        mavenCentral()
+        //add gitHub()
+    }
+
+    dependencies {
+        classpath 'org.gradle.api.plugins:gradle-gae-plugin:0.7.5'
+        classpath 'org.gradle.api.plugins:gradle-gaelyk-plugin:0.3.3'
+        classpath 'eu.appsatori:gradle-fatjar-plugin:0.1.1'
+        //classpath 'bmuschko:gaelyk-jsonlib-plugin:0.2'
+    }
+}
+
+repositories {
+    //mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    def gaeVersion = '1.7.0'
+    groovy 'org.codehaus.groovy:groovy-all:1.8.6'
+    compile "com.google.appengine:appengine-api-1.0-sdk:$gaeVersion",
+            "com.google.appengine:appengine-api-labs:$gaeVersion",
+            "com.google.appengine:appengine-api-labs:$gaeVersion",
+            //'bmuschko:gaelyk-jsonlib-plugin:0.2:zip',
+            //'com.google.appengine:appengine-remote-api:1.6.6',
+            "com.google.appengine:appengine-api-labs:$gaeVersion",
+            //"org.codehaus.groovy.sparql:groovy-sparql:0.2.1",
+            'org.codehaus.groovy:groovy-all:1.8.6'
+    compile 'org.gaelyk:gaelyk:1.2'
+    
+    //compile project(':riddler')
+    /** 
+     * To add binary plugin just declare it as a dependency. For example,
+     * uncomment following to add GPars support to your Gaelyk project.
+     * @see https://github.com/musketyr/gpars-appengine
+     */ 
+    // compile 'org.codehaus.gpars:gpars-appengine:0.1'
+    
+    testCompile 'org.gaelyk:gaelyk-spock:0.3.0.1'
+    testCompile "com.google.appengine:appengine-api-stubs:$gaeVersion",
+                "com.google.appengine:appengine-testing:$gaeVersion"
+
+    functionalTestCompile 'org.codehaus.geb:geb-spock:0.7.0',
+                          'org.seleniumhq.selenium:selenium-firefox-driver:2.25.0'
+    gaeSdk "com.google.appengine:appengine-java-sdk:$gaeVersion"
+}
+
+gae {
+    downloadSdk = true
+    warDir = file('src/main/webapp/')
+    optimizeWar = false
+}
+
+gaeExplodeWar.dependsOn gaelykPrecompileGroovlet
+gaeExplodeWar.dependsOn gaelykPrecompileTemplate
+
+clean {
+     delete sourceSets*.output.classesDir
+}
+
+task copyRuntimeLibraries(type: Sync) {
+    def webAppLibDirName = 'src/main/webapp/WEB-INF/lib'
+    description = "Copies runtime libraries to $webAppLibDirName."
+    from configurations.runtime
+    into webAppLibDirName
+}
+
+gaeRun.dependsOn copyRuntimeLibraries

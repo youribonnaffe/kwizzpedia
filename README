@@ -1,0 +1,6 @@
+A web based quizz. Live at http://kwizzpedia.appspot.com/
+
+Date are extracted from DBpedia, a semantice database based on Wikipedia.
+The questions could be infiniteless given that one code the appropriate query that generate the question.
+
+The code is still a big mess, not tested, not cleaned up with a lot hard coded, dirty things.

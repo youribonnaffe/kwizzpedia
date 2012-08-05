@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Kwizzpedia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+        }
+
+        .btn-fixed-width {
+            width: 150px;
+        }
+
+        .hero-unit {
+            padding-bottom: 30px;
+        }
+
+        .hero-unit-content {
+            height: 200px;
+        }
+
+        .answer {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+        }
+    </style>
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script>
+        var question;
+        function displayQuestion() {
+            $("#question_phrase").text(question.phrase);
+            $("#subject").text(question.subject);
+            $("#category").text(question.category);
+            $.each(question.choices, function (idx, value) {
+                var answer = $($("#answers > a")[idx]);
+                answer.text(value);
+                answer.removeClass("btn-danger btn-success");
+                answer.attr("id", "");
+                answer.addClass("btn-primary");
+                if (value == question.answer) {
+                    answer.attr("id", "answer");
+                }
+            });
+            $("#question").children().show();
+            $("#next").hide();
+            $(".answer").click(answerClick);
+        }
+
+        function queryQuestion(categoryCode) {
+            $.getJSON('/api/question/' + categoryCode, function (data) {
+                question = data
+            });
+        }
+
+        function queryQuestionAndDisplay(categoryCode) {
+            $.getJSON('/api/question/' + categoryCode, function (data) {
+                question = data
+                displayQuestion()
+                queryQuestion(categoryCode);
+            });
+        }
+
+        function answerClick() {
+            var answered = $(this).text();
+            $.each($("#answers > a"), function (idx, value) {
+                $(this).removeClass("btn-primary");
+                $(this).unbind('click');
+                if ($(this).attr("id") == "answer") {
+                    $(this).addClass("btn-success");
+                } else if ($(this).text() == answered) {
+                    $(this).addClass("btn-danger");
+                } else {
+                    $(this).addClass("btn");
+                }
+            });
+            $("#next").show();
+        }
+
+        function startQuizz(categoryCode) {
+            $("#categories").hide();
+            $("#question").show();
+            queryQuestionAndDisplay(categoryCode);
+            var styles = ["btn-danger", "btn-success", "btn-primary"];
+
+            $("#next").click(function () {
+                displayQuestion()
+                queryQuestion(categoryCode)
+                $("#next").hide();
+            });
+            $(document).keypress(function (event) {
+                if ($("#next").is(":visible") && event.keyCode == 39) {
+                    displayQuestion()
+                    queryQuestion(categoryCode);
+                    $("#next").hide();
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $("#question").hide();
+            $("#next").hide();
+
+            $(".btn_category").click(function () {
+                var categoryCode = $(this).text().toLowerCase();
+                startQuizz(categoryCode)
+            });
+
+
+        });
+    </script>
+</head>
+
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <a class="brand" href="/">Kwizzpedia</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="hero-unit" style="text-align: center">
+        <br/>
+
+        <div id="categories" class="hero-unit-content">
+            <p>
+                Pick a category
+            </p>
+            <br/>
+
+            <p>
+                <a class="btn_category btn btn-large btn-fixed-width">Geography</a>&nbsp;&nbsp;&nbsp;
+                <a class="btn_category btn btn-large btn-fixed-width">Literature</a>&nbsp;&nbsp;&nbsp;
+
+            </p>
+        </div>
+        <div id="question" class="hero-unit-content">
+            <p><span id="question_phrase">Capital of</span> <strong id="subject"></strong> ?</p>
+            <br/>
+
+            <p id="answers" class="answers">
+                <a class="answer btn btn-primary btn-large btn-fixed-width"></a>&nbsp;&nbsp;&nbsp;
+                <a class="answer btn btn-primary btn-large btn-fixed-width"></a>&nbsp;&nbsp;&nbsp;
+                <br/>
+                <br/>
+                <a class="answer btn btn-primary btn-large btn-fixed-width"></a>&nbsp;&nbsp;&nbsp;
+                <a class="answer btn btn-primary btn-large btn-fixed-width"></a>&nbsp;&nbsp;&nbsp;
+            </p>
+            <br/>
+            <br/>
+            <img id="next" src="/images/glyphicons_217_circle_arrow_right.png" alt="Next"/>
+        </div>
+        <br/>
+
+        <p style="text-align: left; margin-bottom: 0px"><em>Quizz - <span id="category" style="text-transform:capitalize;"></span></em></p>
+
+    </div>
+
+</div>
+<!-- /container -->
+
+</body>
+</html>

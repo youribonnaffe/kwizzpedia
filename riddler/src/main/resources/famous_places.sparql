@@ -1,0 +1,14 @@
+SELECT ?subject ?noun ("dbpedia2:location" as ?verb)  ?subject_fr  ?subject_en ?noun_fr ?noun_en
+where { ?subject a <http://dbpedia.org/ontology/Place> ;
+dbpedia2:location ?noun .
+?noun a <http://dbpedia.org/ontology/Country> ;
+rdfs:label ?subject_fr ;
+rdfs:label ?subject_en .
+?noun rdfs:label ?noun_fr .
+?noun rdfs:label ?noun_en .
+FILTER langMatches( lang(?subject_fr), 'fr') .
+FILTER langMatches( lang(?subject_en), 'en') .
+FILTER langMatches( lang(?noun_fr), 'fr') .
+FILTER langMatches( lang(?noun_en), 'en')
+}
+Limit 10

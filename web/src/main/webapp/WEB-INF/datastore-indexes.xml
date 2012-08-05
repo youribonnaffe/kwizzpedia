@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datastore-indexes autoGenerate="false">
+
+    <datastore-index kind="question" ancestor="false" source="manual">
+        <property name="category" direction="asc"/>
+        <property name="random_number" direction="asc"/>
+    </datastore-index>
+</datastore-indexes>

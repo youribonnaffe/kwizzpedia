@@ -1,0 +1,14 @@
+SELECT ?subject ?noun ("Who wrote" as ?verb)  ?subject_fr  ?subject_en ?noun_fr ?noun_en
+where { ?subject a <http://dbpedia.org/ontology/Book> .
+?subject rdfs:label ?subject_fr .
+?subject rdfs:label ?subject_en ;
+dbpedia2:author ?noun .
+?noun a <http://dbpedia.org/ontology/Person> .
+?noun rdfs:label ?noun_fr .
+?noun rdfs:label ?noun_en 
+FILTER langMatches( lang(?subject_fr), 'fr') .
+FILTER langMatches( lang(?subject_en), 'en') .
+FILTER langMatches( lang(?noun_fr), 'fr') .
+FILTER langMatches( lang(?noun_en), 'en')
+}
+Limit 100
